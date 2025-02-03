@@ -1,0 +1,26 @@
+/* Dashboard styling */
+.dashboard {
+    padding: 20px;
+}
+
+.dashboard h1 {
+    color: #007bff;
+}
+
+.profile-list {
+    list-style: none;
+    padding: 0;
+}
+
+.profile-item {
+    background: #fff;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.profile-actions button {
+    margin-right: 10px;
+    padding: 5px 10px;
+}
