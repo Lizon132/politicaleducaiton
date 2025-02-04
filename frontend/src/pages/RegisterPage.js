@@ -1,84 +1,85 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const RegisterPage = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        setMessage('');
-        setError('');
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
 
         try {
             const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/user/register`, {
                 username,
                 email,
                 password,
-            }, { withCredentials: true });
+            });
 
-            console.log('Registration successful:', response.data);
-            setMessage('Registration successful! Redirecting to Dashboard...');
-
-            // Store session and redirect
-            localStorage.setItem('userId', response.data.userId);
-            setTimeout(() => navigate('/dashboard'), 1500);
+            setMessage('Registration successful! Please log in.');
+            setError('');
         } catch (err) {
-            const errorMessage =
-                err.response && err.response.data && err.response.data.error
-                    ? err.response.data.error
-                    : 'An unexpected error occurred: ' + err.message;
-
-            console.error('Error during registration:', errorMessage);
-            setError(errorMessage);
+            setError(err.response?.data?.error || 'Registration failed');
+            setMessage('');
         }
     };
 
     return (
-        <div className="register-page">
-            <div className="register-container">
-                <h1>Register</h1>
-                {message && <p className="success-message">{message}</p>}
-                {error && <p className="error-message">{error}</p>}
-                <form onSubmit={handleRegister} className="register-form">
-                    <div className="form-group">
-                        <label>Username</label>
-                        <input
-                            type="text"
-                            placeholder="Enter your username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Email</label>
-                        <input
-                            type="email"
-                            placeholder="Enter your email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input
-                            type="password"
-                            placeholder="Enter your password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <button type="submit" className="submit-button">Register</button>
-                </form>
-            </div>
+        <div className="container mt-4">
+            <h2>Register</h2>
+            {message && <div className="alert alert-success">{message}</div>}
+            {error && <div className="alert alert-danger">{error}</div>}
+
+            <form onSubmit={handleRegister}>
+                <div className="mb-3">
+                    <label className="form-label">Username</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label">Email</label>
+                    <input
+                        type="email"
+                        className="form-control"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label">Password</label>
+                    <input
+                        type="password"
+                        className="form-control"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label">Confirm Password</label>
+                    <input
+                        type="password"
+                        className="form-control"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                    />
+                </div>
+                <button type="submit" className="btn btn-primary">Register</button>
+            </form>
         </div>
     );
 };
