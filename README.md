@@ -1,41 +1,57 @@
-# README: Political Education App
+# Political Education App
 
-## Description
-The **Political Education App** is a web-based application that allows users to create profiles based on their demographic and political concerns. Users can input their preferences and information in free-form text, which is analyzed and categorized by an AI model. The app provides features such as creating, editing, and deleting profiles, viewing personalized dashboards, and comparing profiles to political candidates' platforms.
+## Overview
+The **Political Education App** is a web-based platform designed to help users understand how political candidates' policies align with their personal interests. The app enables users to create detailed profiles based on demographic, economic, and social factors, allowing for an AI-assisted analysis of political policies relevant to them.
 
-Key features:
-- **User Authentication**: Secure login and registration with sessions.
-- **Profile Management**: Create, edit, view, and delete profiles.
-- **Settings Page**: Customize app appearance and settings.
-- **Protected Routes**: Ensure secure access to user-specific pages.
+### 🔹 **Goals of the Application**
+- **Personalized Political Education**: Help users understand how policies affect their lives based on their profile data.
+- **AI-Assisted Analysis**: Use AI to categorize user concerns and compare them against official candidate positions.
+- **User-Centric Profile Creation**: Allow users to input free-form text to describe their concerns instead of selecting from predefined categories.
+- **Security & Privacy**: Use session-based authentication with secure HTTP-only cookies.
+- **Dynamic Navigation**: Display different UI elements based on login status.
 
-## Prerequisites
-- **Node.js**: Ensure you have Node.js installed on your machine.
-- **SQLite3**: Database engine to store user and profile data.
-- **npm/yarn**: Package manager for dependency installation.
+## 🚀 Features
+- **User Authentication**: Register, login, logout, and manage account settings.
+- **Profile Management**: Create and edit profiles with detailed information.
+- **Candidate Policy Matching**: AI-powered categorization of user data to match relevant political stances.
+- **Secure Sessions**: Authentication with HTTP-only cookies and session handling.
+- **Customizable Settings**: Update user email, password, and other personal preferences.
+- **Dynamic Navbar**: Adjusts based on login status to show relevant pages.
 
----
-
-## Installation
-
-### 1. Clone the Repository
-```bash
-git clone <repository_url>
-cd political-education-app
+## 📂 Project Structure
+```
+politicaleducation/
+│── backend/              # Express.js backend
+│   ├── database.js       # SQLite3 database connection
+│   ├── server.js         # Main backend application
+│   ├── routes/           # API routes for users and profiles
+│   ├── .env              # Environment variables
+│   └── package.json      # Backend dependencies
+│
+│── frontend/             # React.js frontend
+│   ├── src/
+│   │   ├── components/   # Reusable UI components
+│   │   ├── pages/        # App pages (Dashboard, Settings, etc.)
+│   │   ├── App.js        # Main application logic
+│   │   ├── index.js      # Root file
+│   │   ├── styles/       # CSS files
+│   ├── public/           # Static assets
+│   ├── .env              # Frontend environment variables
+│   └── package.json      # Frontend dependencies
 ```
 
-### 2. Set Up Backend
-Navigate to the backend directory:
+## 🛠️ Installation & Setup
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/Lizon132/politicaleducation.git
+cd politicaleducation
+```
+### 2️⃣ Backend Setup
 ```bash
 cd backend
-```
-
-Install dependencies:
-```bash
 npm install
 ```
-
-Create a `.env` file in the `backend` directory with the following content:
+Create a `.env` file inside `backend/`:
 ```
 SESSION_SECRET=your-secret-key
 NODE_ENV=development
@@ -43,101 +59,71 @@ CORS_ORIGIN=http://localhost:3001
 PORT=3000
 API_BASE_URL=http://localhost:3000
 ```
-
-Start the backend server:
+Start the backend:
 ```bash
 npm start
 ```
-The server will run on `http://localhost:3000`.
 
-### 3. Set Up Frontend
-Navigate to the frontend directory:
+### 3️⃣ Frontend Setup
 ```bash
 cd ../frontend
-```
-
-Install dependencies:
-```bash
 npm install
 ```
-
-Create a `.env` file in the `frontend` directory with the following content:
+Create a `.env` file inside `frontend/`:
 ```
 PORT=3001
 REACT_APP_BACKEND_URL=http://localhost:3000
 ```
-
-Start the frontend development server:
+Start the frontend:
 ```bash
 npm start
 ```
-The frontend will run on `http://localhost:3001`.
 
----
+## 📌 Usage
+1. **Register/Login** at `http://localhost:3001`.
+2. **Create a Profile** to input personal concerns and preferences.
+3. **View Analysis** of how policies affect your life.
+4. **Update Settings** (email, password, preferences) through the Settings page.
+5. **Logout** securely to end the session.
 
-## Usage
+## 🔧 Development Notes
+### Backend API Endpoints
+| Method | Endpoint | Description |
+|--------|---------|-------------|
+| POST | `/user/login` | Logs in the user and starts a session |
+| POST | `/user/logout` | Ends the user's session |
+| GET | `/user/session` | Checks if the user is logged in |
+| POST | `/user/register` | Registers a new user |
+| GET | `/user/:id/profiles` | Fetches user profiles |
 
-### User Authentication
-1. Navigate to `http://localhost:3001`.
-2. Register a new account or log in with existing credentials.
+### Frontend Components
+- **Navbar**: Adjusts based on authentication status.
+- **ProtectedRoute**: Ensures authenticated users can access specific pages.
+- **Forms**: Implement validation for registration and settings.
 
-### Profile Management
-1. Once logged in, navigate to the **Dashboard**.
-2. Create, edit, or delete profiles as needed.
-3. Profiles can include free-form text for demographic and political preferences.
+## 🔍 Troubleshooting
+### Port Conflicts
+- Ensure ports `3000` (backend) and `3001` (frontend) are available.
+- Kill processes using those ports if necessary:
+```bash
+npx kill-port 3000 3001
+```
 
-### Settings
-1. Access the **Settings** page from the navigation bar.
-2. Customize application themes or other preferences.
+### CORS Issues
+- Ensure the backend’s `CORS_ORIGIN` matches the frontend’s URL in the `.env` file.
 
-### Logout
-Click the **Logout** button in the navigation bar to securely log out of your account.
+### Sessions Not Persisting
+- Enable cookies in your browser.
+- Restart the backend with `npm start`.
 
----
+## 🔜 Future Improvements
+- **Better AI Processing**: Improved policy-matching algorithms.
+- **User Dashboard Enhancements**: More visual elements for tracking policy matches.
+- **Mobile Responsiveness**: Improved UI for mobile devices.
 
-## Development Notes
-
-### Backend Endpoints
-- **POST `/user/login`**: Logs in a user.
-- **POST `/user/logout`**: Logs out a user.
-- **GET `/user/session`**: Checks the session status.
-- **GET `/user/:id/profiles`**: Fetches profiles for a user.
-
-### Frontend Structure
-- **Pages**:
-  - Home
-  - Login
-  - Register
-  - Dashboard
-  - Settings
-- **Components**:
-  - Navbar
-  - ProtectedRoute
-
----
-
-## Troubleshooting
-
-### Common Issues
-1. **Port Conflicts**:
-   - Ensure ports `3000` and `3001` are not in use by other processes. Use `lsof -i :port` (Linux/macOS) or `netstat -ano | findstr :port` (Windows) to identify conflicts.
-
-2. **CORS Errors**:
-   - Verify `CORS_ORIGIN` in the backend `.env` file matches the frontend's URL.
-
-3. **Session Not Persisting**:
-   - Ensure cookies are enabled in your browser.
-   - Use HTTPS in production for secure cookies.
-
----
-
-## Future Features
-- Integration with AI models for better categorization of user inputs.
-- Enhanced analysis of political candidate platforms.
-- Advanced user settings and preferences.
-
----
-
-## License
+## 📜 License
 This project is licensed under the MIT License.
+
+---
+Made with ❤️ by Lizon132
 
