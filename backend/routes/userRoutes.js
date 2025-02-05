@@ -129,4 +129,21 @@ router.post('/logout', (req, res) => {
     });
 });
 
+// Get user profile responses
+router.get('/profile/:userId', (req, res) => {
+    const { userId } = req.params;
+
+    profilesDb.all(
+        `SELECT question_id, response, confidence_level, follow_up_needed FROM user_profiles WHERE user_id = ?`,
+        [userId],
+        (err, rows) => {
+            if (err) {
+                console.error('Database error:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+            res.json(rows);
+        }
+    );
+});
+
 export default router;
