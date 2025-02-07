@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ProfileDashboard from '../components/ProfileDashboard';
 
 const DashboardPage = () => {
     const [profiles, setProfiles] = useState([]);
@@ -10,39 +11,35 @@ const DashboardPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchSession = async () => {
+        const fetchSessionAndProfiles = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/user/session`, {
+                // Fetch session first
+                const sessionResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/user/session`, {
                     withCredentials: true,
                 });
 
-                if (response.data.loggedIn) {
-                    setUser(response.data.user);
+                if (sessionResponse.data.loggedIn) {
+                    setUser(sessionResponse.data.user);
+                    
+                    // Fetch profiles only if the user is authenticated
+                    const profileResponse = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/profile/${sessionResponse.data.user.id}`, {
+                        withCredentials: true,
+                    });
+
+                    setProfiles(profileResponse.data);
                 } else {
                     navigate('/login');
                 }
             } catch (err) {
-                console.error('Error checking session:', err);
+                console.error('Error checking session or fetching profiles:', err);
+                setError('Failed to authenticate or load profiles.');
                 navigate('/login');
-            }
-        };
-
-        const fetchProfiles = async () => {
-            try {
-                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/user/profiles`, {
-                    withCredentials: true,
-                });
-                setProfiles(response.data);
-            } catch (err) {
-                console.error('Error fetching profiles:', err);
-                setError('Failed to load profiles. Please try again later.');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchSession();
-        fetchProfiles();
+        fetchSessionAndProfiles();
     }, [navigate]);
 
     const handleCreateProfile = () => {
@@ -58,6 +55,7 @@ const DashboardPage = () => {
             await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/profile/${id}`, {
                 withCredentials: true,
             });
+
             setProfiles((prevProfiles) => prevProfiles.filter((profile) => profile.id !== id));
         } catch (err) {
             console.error('Error deleting profile:', err);
@@ -66,36 +64,42 @@ const DashboardPage = () => {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h1>Welcome {user ? user.username : 'User'}!</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className="container mt-4">
+            <h1>Welcome, {user ? user.username : 'User'}!</h1>
+
+            {error && <div className="alert alert-danger">{error}</div>}
+
             {loading ? (
                 <p>Loading profiles...</p>
             ) : (
                 <>
                     <h2>Your Profiles</h2>
                     {profiles.length > 0 ? (
-                        <ul>
+                        <div className="list-group">
                             {profiles.map((profile) => (
-                                <li key={profile.id} style={{ marginBottom: '10px' }}>
-                                    <strong>{profile.name}</strong> - {profile.visibility}
+                                <div key={profile.id} className="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <button className="btn btn-primary" onClick={() => handleEditProfile(profile.id)}>
+                                        <strong>{profile.name}</strong> - {profile.visibility}
+                                    </div>
+                                    <div>
+                                        <button className="btn btn-primary btn-sm me-2" onClick={() => handleEditProfile(profile.id)}>
                                             Edit
                                         </button>
-                                        <button className="btn btn-danger" onClick={() => handleDeleteProfile(profile.id)}>
+                                        <button className="btn btn-danger btn-sm" onClick={() => handleDeleteProfile(profile.id)}>
                                             Delete
                                         </button>
                                     </div>
-                                </li>
+                                </div>
                             ))}
-                        </ul>
+                        </div>
                     ) : (
                         <p>You haven't created any profiles yet.</p>
                     )}
-                    <button className="btn btn-success" onClick={handleCreateProfile}>
-                        Create New Profile
-                    </button>
+                    {profiles.length < 10 && (
+                        <button className="btn btn-success mt-3" onClick={handleCreateProfile}>
+                            Create New Profile
+                        </button>
+                    )}
                 </>
             )}
         </div>
