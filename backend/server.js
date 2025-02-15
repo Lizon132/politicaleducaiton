@@ -27,10 +27,10 @@ app.use(bodyParser.json());
 // Enable CORS
 app.use(
     cors({
-        origin: process.env.CORS_ORIGIN || 'http://localhost:3001', // Allow frontend requests
+        origin: process.env.CORS_ORIGIN || 'http://localhost:3001',
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
-        credentials: true, // Allow cookies in requests
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
     })
 );
 
@@ -49,25 +49,6 @@ app.use(
     })
 );
 
-// HTTPS Configuration
-if (process.env.NODE_ENV !== 'production') {
-    const httpsServer = https.createServer(
-        {
-            key: fs.readFileSync('server.key'), // Path to your private key
-            cert: fs.readFileSync('server.cert'), // Path to your certificate
-        },
-        app
-    );
-
-    httpsServer.listen(PORT, () => {
-        console.log(`Server running at https://localhost:${PORT}`);
-    });
-} else {
-    // Fallback to HTTP if not running HTTPS (use only in production setup)
-    app.listen(PORT, () => {
-        console.log(`Server running at ${BASE_URL}`);
-    });
-}
 // Configure session
 const SQLiteSessionStore = SQLiteStore(session);
 app.use(
@@ -78,8 +59,8 @@ app.use(
         saveUninitialized: false,
         cookie: {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-            sameSite: 'strict', // Protect against CSRF
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
             maxAge: 24 * 60 * 60 * 1000, // 1 day
         },
     })
@@ -94,31 +75,7 @@ const requireAuth = (req, res, next) => {
 };
 
 // Routes
-app.use('/user', userRoutes); // Use modular user routes
-
-// Fetch user profile
-app.get('/user/profile', requireAuth, (req, res) => {
-    const userId = req.session.userId;
-
-    if (!userId) {
-        return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    usersDb.get(
-        `SELECT id, username, email, created_at FROM users WHERE id = ?`,
-        [userId],
-        (err, user) => {
-            if (err) {
-                console.error('Database error:', err.message);
-                return res.status(500).json({ error: 'Internal server error' });
-            }
-            if (!user) {
-                return res.status(404).json({ error: 'User not found' });
-            }
-            res.json({ profile: user });
-        }
-    );
-});
+app.use('/user', userRoutes);
 
 // Example protected route
 app.get('/dashboard', requireAuth, (req, res) => {
@@ -132,11 +89,20 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-app.listen(PORT, '0.0.0.0', (err) => {
-    if (err) {
-        console.error(`Failed to start server: ${err.message}`);
-        process.exit(1);
-    } else {
-        console.log(`Server running at http://localhost:${PORT}`);
-    }
-});
+if (process.env.NODE_ENV !== 'production') {
+    const httpsServer = https.createServer(
+        {
+            key: fs.readFileSync('server.key'),
+            cert: fs.readFileSync('server.cert'),
+        },
+        app
+    );
+
+    httpsServer.listen(PORT, () => {
+        console.log(`Server running at https://localhost:${PORT}`);
+    });
+} else {
+    app.listen(PORT, () => {
+        console.log(`Server running at ${BASE_URL}`);
+    });
+}
