@@ -38,6 +38,8 @@ const ProfileForm = ({ userId, onProfileCreated }) => {
             setProfileName('');
             setResponses(Array(10).fill(''));
 
+            console.log('Profile created:', response.data);
+
             if (onProfileCreated) onProfileCreated();
         } catch (err) {
             setError('Error creating profile. Please try again.');
