@@ -24,9 +24,13 @@
     "helmet": "^8.0.0",
     "nanoid": "^5.0.9",
     "openai": "^4.73.1",
-    "sqlite3": "^5.1.4"
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
+  },
+  "scripts": {
+    "install:dev": "node installer.js"
   }
+
 }
